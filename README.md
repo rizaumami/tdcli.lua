@@ -1,5 +1,5 @@
 # tdcli.lua
-A simple Lua library for the [`telegram-cli](https://valtman.name/telegram-cli).
+A simple Lua library for the [`telegram-cli`](https://valtman.name/telegram-cli).
 
 ## How to Use
 

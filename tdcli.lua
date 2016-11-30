@@ -49,10 +49,8 @@ local function getInputMessageContent(file, filetype, caption)
 end
 
 -- User can send bold, italic, and monospace text uses HTML or Markdown format.
-local function getParseMode(parse_mode)
-  local P = {}
-  
-  if parse_mode_ then
+local function getParseMode(parse_mode)  
+  if parse_mode then
     local mode = parse_mode:lower()
   
     if mode == 'markdown' or mode == 'md' then
@@ -499,12 +497,12 @@ M.searchMessages = searchMessages
 -- @reply_markup Bots only. Markup for replying to message @input_message_content Content of a message to send
 local function sendMessage(chat_id, reply_to_message_id, disable_notification, text, disable_web_page_preview, parse_mode)
   local TextParseMode = getParseMode(parse_mode)
-
+  
   tdcli_function ({
     ID = "SendMessage",
     chat_id_ = chat_id,
     reply_to_message_id_ = reply_to_message_id,
-    disable_notification_ = 0,
+    disable_notification_ = disable_notification,
     from_background_ = 1,
     reply_markup_ = nil,
     input_message_content_ = {
