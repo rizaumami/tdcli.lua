@@ -52,7 +52,7 @@ end
 local function getParseMode(parse_mode)
   local P = {}
   
-  if parse_mode_ then
+  if parse_mode then
     local mode = parse_mode:lower()
   
     if mode == 'markdown' or mode == 'md' then
