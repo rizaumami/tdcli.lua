@@ -579,7 +579,9 @@ M.deleteMessages = deleteMessages
 
 -- Edits text of text or game message. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side
 -- @chat_id Chat the message belongs to @message_id Identifier of the message @reply_markup Bots only. New message reply markup @input_message_content New text content of the message. Should be of type InputMessageText
-local function editMessageText(chat_id, message_id, reply_markup, text, disable_web_page_preview)
+local function editMessageText(chat_id, message_id, reply_markup, text, disable_web_page_preview, parse_mode)
+  local TextParseMode = getParseMode(parse_mode)
+  
   tdcli_function ({
     ID = "EditMessageText",
     chat_id_ = chat_id,
@@ -590,7 +592,8 @@ local function editMessageText(chat_id, message_id, reply_markup, text, disable_
       text_ = text,
       disable_web_page_preview_ = disable_web_page_preview,
       clear_draft_ = 0,
-      entities_ = {}
+      entities_ = {},
+      parse_mode_ = TextParseMode,
     },
   }, dl_cb, nil)
 end
