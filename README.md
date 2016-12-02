@@ -121,7 +121,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] migrateGroupChatToChannelChat
 - [x] changeChatTitle
 - [x] changeChatPhoto
-- [ ] changeChatDraftMessage
+- [x] changeChatDraftMessage
 - [x] addChatMember
 - [x] addChatMembers
 - [x] changeChatMemberStatus
@@ -186,31 +186,55 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] changeChatReportSpamState
 - [ ] setBotUpdatesStatus
 - [x] setAlarm
+- [x] account_change_username
+- [x] account_change_name
+- [x] account_change_photo
 - [x] add_contact
+- [x] block_user
 - [x] channel_get_admins
 - [x] channel_get_bots
 - [x] channel_get_kicked
+- [x] channel_get_members
+- [x] channel_change_about
+- [x] channel_change_username
 - [x] channel_edit
+- [x] chat_add_user
+- [x] chat_change_photo
+- [x] chat_change_title
 - [x] chat_change_role
 - [x] chat_del_user
 - [x] chat_info
 - [x] chat_join
 - [x] chat_leave
+- [x] chat_check_invite_link
 - [x] chat_create_broadcast
 - [x] chat_create_group
 - [x] chat_create_supergroup
+- [x] chat_export_invite_link
+- [x] chat_import_invite_link
 - [x] contact_list
-- [ ] dialog_list
+- [x] contact_delete
+- [x] delete_msg
+- [x] dialog_list
+- [x] fwd
+- [x] get_message
 - [x] group_upgrade
+- [x] history
 - [x] mark_read
+- [x] msg
 - [x] mute
+- [x] pin_message
 - [ ] push_button
 - [x] resolve_username
+- [x] reply
 - [x] reply_file
 - [ ] reply_fwd
 - [x] reply_location
+- [s] search
 - [x] send_file
 - [x] send_location
+- [x] send_typing
 - [x] start_bot
 - [x] timer
+- [x] unblock_user
 - [x] unmute
