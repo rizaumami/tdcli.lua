@@ -230,7 +230,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] reply_file
 - [ ] reply_fwd
 - [x] reply_location
-- [s] search
+- [x] search
 - [x] send_file
 - [x] send_location
 - [x] send_typing

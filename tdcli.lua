@@ -29,7 +29,7 @@ local function getChatId(chat_id)
   local chat = {}
   local chat_id = tostring(chat_id)
 
-  if id:match('^-100') then
+  if chat_id:match('^-100') then
     local channel_id = chat_id:gsub('-100', '')
     chat = {ID = channel_id, type = 'channel'}
   else
@@ -2148,7 +2148,7 @@ end
 
 M.channel_get_admins = channel_get_admins
 
--- Gets channel M.
+-- Gets channel bots
 local function channel_get_bots(channel_id)
   getChannelMembers(channel_id, 0, 'Bots')
 end
