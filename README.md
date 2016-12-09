@@ -3,7 +3,7 @@ A simple Lua library for the [`telegram-cli`](https://valtman.name/telegram-cli)
 
 ## How to Use
 
-See example [script](https://github.com/rizaumami/tdcli.lua/wiki/script) below.  
+See example script below.  
 - Place this `tdcli.lua` file inside the same folder as your bot, or anywhere else as long as you import it properly.
 - Import it into your bot.
 - Call a function.
@@ -18,15 +18,15 @@ end
 function tdcli_update_callback(data)
   if (data.ID == "UpdateNewMessage") then
     local msg = data.message_
-    -- If [the](https://github.com/rizaumami/tdcli.lua/wiki/the) message is text message
-    if msg.content_.ID [==](https://github.com/rizaumami/tdcli.lua/wiki/==) "MessageText" then
-      -- And [the](https://github.com/rizaumami/tdcli.lua/wiki/the) text is...
-      if msg.content_.text_ [==](https://github.com/rizaumami/tdcli.lua/wiki/==) "ping" then
-        -- Reply [with](https://github.com/rizaumami/tdcli.lua/wiki/with) unformatted text
+    -- If the message is text message
+    if msg.content_.ID == "MessageText" then
+      -- And the text is...
+      if msg.content_.text_ == "ping" then
+        -- Reply with unformatted text
         tdcli.sendMessage(msg.chat_id_, msg.id_, 1, 'pong', 1)
-      -- And [if](https://github.com/rizaumami/tdcli.lua/wiki/if) the text is...
-      elseif msg.content_.text_ [==](https://github.com/rizaumami/tdcli.lua/wiki/==) "PING" then
-        -- Reply [with](https://github.com/rizaumami/tdcli.lua/wiki/with) formatted text
+      -- And if the text is...
+      elseif msg.content_.text_ == "PING" then
+        -- Reply with formatted text
         tdcli.sendMessage(msg.chat_id_, 0, 1, '<b>PONG</b>', 1, 'html')
       end
     end
@@ -94,7 +94,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [editMessageText](https://github.com/rizaumami/tdcli.lua/wiki/editMessageText)
 - [x] [editMessageCaption](https://github.com/rizaumami/tdcli.lua/wiki/editMessageCaption)
 - [ ] editMessageReplyMarkup
-- [ []](https://github.com/rizaumami/tdcli.lua/wiki/]) editInlineMessageText
+- [ ] editInlineMessageText
 - [ ] editInlineMessageCaption
 - [ ] editInlineMessageReplyMarkup
 - [ ] getInlineQueryResults
