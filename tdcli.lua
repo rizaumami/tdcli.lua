@@ -40,7 +40,7 @@ local function getChatId(chat_id)
   return chat
 end
 
-local function getInputMessageContent(file, filetype, caption)
+local function getInputFile(file)
   if file:match('/') then
     infile = {ID = "InputFileLocal", path_ = file}
   elseif file:match('^%d+$') then
@@ -49,26 +49,7 @@ local function getInputMessageContent(file, filetype, caption)
     infile = {ID = "InputFilePersistentId", persistent_id_ = file}
   end
 
-  local inmsg = {}
-  local filetype = filetype:lower()
-
-  if filetype == 'animation' then
-    inmsg = {ID = "InputMessageAnimation", animation_ = infile, caption_ = caption}
-  elseif filetype == 'audio' then
-    inmsg = {ID = "InputMessageAudio", audio_ = infile, caption_ = caption}
-  elseif filetype == 'document' then
-    inmsg = {ID = "InputMessageDocument", document_ = infile, caption_ = caption}
-  elseif filetype == 'photo' then
-    inmsg = {ID = "InputMessagePhoto", photo_ = infile, caption_ = caption}
-  elseif filetype == 'sticker' then
-    inmsg = {ID = "InputMessageSticker", sticker_ = infile, caption_ = caption}
-  elseif filetype == 'video' then
-    inmsg = {ID = "InputMessageVideo", video_ = infile, caption_ = caption}
-  elseif filetype == 'voice' then
-    inmsg = {ID = "InputMessageVoice", voice_ = infile, caption_ = caption}
-  end
-
-  return inmsg
+  return infile
 end
 
 -- User can send bold, italic, and monospace text uses HTML or Markdown format.
@@ -619,38 +600,6 @@ end
 
 M.searchMessages = searchMessages
 
--- Sends a message.
--- Returns sent message.
--- UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
--- @chat_id Chat to send message
--- @reply_to_message_id Identifier of a message to reply to or 0
--- @disable_notification Pass true, to disable notification about the message
--- @from_background Pass true, if the message is sent from background
--- @reply_markup Bots only. Markup for replying to message
--- @input_message_content Content of a message to send
-local function sendMessage(chat_id, reply_to_message_id, disable_notification, text, disable_web_page_preview, parse_mode)
-  local TextParseMode = getParseMode(parse_mode)
-
-  tdcli_function ({
-    ID = "SendMessage",
-    chat_id_ = chat_id,
-    reply_to_message_id_ = reply_to_message_id,
-    disable_notification_ = disable_notification,
-    from_background_ = 1,
-    reply_markup_ = nil,
-    input_message_content_ = {
-      ID = "InputMessageText",
-      text_ = text,
-      disable_web_page_preview_ = disable_web_page_preview,
-      clear_draft_ = 0,
-      entities_ = {},
-      parse_mode_ = TextParseMode,
-    },
-  }, dl_cb, nil)
-end
-
-M.sendMessage = sendMessage
-
 -- Invites bot to a chat (if it is not in the chat) and send /start to it.
 -- Bot can't be invited to a private chat other than chat with the bot.
 -- Bots can't be invited to broadcast channel chats.
@@ -1198,14 +1147,11 @@ M.changeChatTitle = changeChatTitle
 -- Photo will not be changed if application is killed before it can send request to the server.
 -- There will be update about change of the photo on success. Otherwise error will be returned @chat_id Chat identifier
 -- @photo New chat photo. You can use zero InputFileId to delete photo. Files accessible only by HTTP URL are not acceptable
-local function changeChatPhoto(chat_id, file)
+local function changeChatPhoto(chat_id, photo)
   tdcli_function ({
     ID = "ChangeChatPhoto",
     chat_id_ = chat_id,
-    photo_ = {
-      ID = "InputFileLocal",
-      path_ = file
-    }
+    photo_ = getInputFile(photo)
   }, dl_cb, nil)
 end
 
@@ -1536,13 +1482,10 @@ M.getSavedAnimations = getSavedAnimations
 -- If the animation is already in the list, at first it is removed from the list.
 -- Only video animations with MIME type "video/mp4" can be added to the list
 -- @animation Animation file to add. Only known to server animations (i. e. successfully sent via message) can be added to the list
-local function addSavedAnimation(id)
+local function addSavedAnimation(animation)
   tdcli_function ({
     ID = "AddSavedAnimation",
-    animation_ = {
-      ID = "InputFileId",
-      id_ = id
-    },
+    animation_ = getInputFile(animation)
   }, dl_cb, nil)
 end
 
@@ -1550,13 +1493,10 @@ M.addSavedAnimation = addSavedAnimation
 
 -- Removes animation from the list of saved animations
 -- @animation Animation file to delete
-local function deleteSavedAnimation(id)
+local function deleteSavedAnimation(animation)
   tdcli_function ({
     ID = "DeleteSavedAnimation",
-    animation_ = {
-      ID = "InputFileId",
-      id_ = id
-    },
+    animation_ = getInputFile(animation)
   }, dl_cb, nil)
 end
 
@@ -2103,378 +2043,245 @@ end
 
 M.setAlarm = setAlarm
 
+-- Text message 
+-- @text Text to send
+-- @disable_web_page_preview Pass true to disable rich preview for link in the message text
+-- @clear_draft Pass true if chat draft message should be deleted
+-- @entities Bold, Italic, Code, Pre, PreCode and TextUrl entities contained in the text. Non-bot users can't use TextUrl entities. Can't be used with non-null parse_mode
+-- @parse_mode Text parse mode, nullable. Can't be used along with enitities
+local function sendText(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, text, disable_web_page_preview, parse_mode)
+  local TextParseMode = getParseMode(parse_mode)
 
--- These functions below are an effort to mimic telegram-cli console commands --
-
--- Sets profile username
-local function account_change_username(username)
-  changeUsername(username)
-end
-
-M.account_change_username = account_change_username
-
--- Sets profile name
-local function account_change_name(first_name, last_name)
-  changeName(first_name, last_name)
-end
-
-M.account_change_name = account_change_name
-
--- Sets profile photo. Photo will be cropped to square
-local function account_change_photo(photo_path)
-  setProfilePhoto(photo_path)
-end
-
-M.account_change_photo = account_change_photo
-
--- Tries to add user to contact list
-local function add_contact(phone, first_name, last_name, user_id)
-  importContacts(phone, first_name, last_name, user_id)
-end
-
-M.add_contact = add_contact
-
--- Blocks user
-local function block_user(user_id)
-  blockUser(user_id)
-end
-
-M.block_user = block_user
-
--- Gets channel admins
-local function channel_get_admins(channel_id)
-  getChannelMembers(channel_id, 0, 'Administrators')
-end
-
-M.channel_get_admins = channel_get_admins
-
--- Gets channel bots
-local function channel_get_bots(channel_id)
-  getChannelMembers(channel_id, 0, 'Bots')
-end
-
-M.channel_get_bots = channel_get_bots
-
--- Gets channel kicked members
-local function channel_get_kicked(channel_id)
-  getChannelMembers(channel_id, 0, 'Kicked')
-end
-
-M.channel_get_kicked = channel_get_kicked
-
--- Gets channel recent members
-local function channel_get_members(channel_id)
-  getChannelMembers(channel_id, 0, 'Recent')
-end
-
-M.channel_get_members = channel_get_members
-
--- Changes channel username
-local function channel_change_about(channel_id, about)
-  changeChannelAbout(channel_id, about)
-end
-
-M.channel_change_about = channel_change_about
-
--- Changes channel about info
-local function channel_change_username(channel_id, username)
-  changeChannelUsername(channel_id, username)
-end
-
-M.channel_change_username = channel_change_username
-
--- changes value of basic channel parameters.
--- param=sign|invites
-local function channel_edit(channel_id, param, enabled)
-  if param:lower() == 'sign' then
-    toggleChannelSignMessages(channel_id, enabled)
-  elseif param:lower() == 'invites' then
-    toggleChannelInvites(channel_id, enabled)
-  end
-end
-
-M.channel_edit = channel_edit
-
--- Adds user to chat.
--- Sends him last msgs_to_forward messages (only for group chats) from this chat
-local function chat_add_user(chat_id, user_id, msgs_to_forward)
-  addChatMember(chat_id, user_id, msgs_to_forward)
-end
-
-M.chat_add_user = chat_add_user
-
--- Changes chat photo. Photo will be cropped to square
-local function chat_change_photo(chat_id, file)
-  changeChatPhoto(chat_id, file)
-end
-
-M.chat_change_photo = chat_change_photo
-
--- Renames chat
-local function chat_change_title(chat_id, title)
-  changeChatTitle(chat_id, title)
-end
-
-M.chat_change_title = chat_change_title
-
--- changes user's role in chat.
--- role=Creator|Editor|Moderator|Member|Left|Kicked
-local function chat_change_role(chat_id, user_id, role)
-  changeChatMemberStatus(chat_id, user_id, role)
-end
-
-M.chat_change_role = chat_change_role
-
--- Deletes user from chat
-local function chat_del_user(chat_id, user_id)
-  changeChatMemberStatus(chat_id, user_id, 'Kicked')
-end
-
-M.chat_del_user = chat_del_user
-
--- Prints info about chat
-local function chat_info(chat_id)
-  getChat(chat_id)
-end
-
-M.chat_info = chat_info
-
--- Joins to chat (by invite link)
-local function chat_join(invite_link)
-  importChatInviteLink(invite_link)
-end
-
-M.chat_join = chat_join
-
--- Leaves chat
-local function chat_leave(chat_id, user_id)
-  changeChatMemberStatus(chat_id, user_id, "Left")
-end
-
-M.chat_leave = chat_leave
-
--- Print info about chat by link
-local function chat_check_invite_link(invite_link)
-  checkChatInviteLink(invite_link)
-end
-
-M.chat_check_invite_link = chat_check_invite_link
-
--- Creates broadcast channel
-local function chat_create_broadcast(title, about)
-  createNewChannelChat(title, 0, about)
-end
-
-M.chat_create_broadcast = chat_create_broadcast
-
--- Creates group chat
-local function chat_create_group(title, user_ids)
-  createNewGroupChat(title, user_ids)
-end
-
-M.chat_create_group = chat_create_group
-
--- Creates supergroup channel
-local function chat_create_supergroup(title, about)
-  createNewChannelChat(title, 1, about)
-end
-
-M.chat_create_supergroup = chat_create_supergroup
-
--- Exports new invite link (and invalidates previous)
-local function chat_export_invite_link(chat_id)
-  exportChatInviteLink(chat_id)
-end
-
-M.chat_export_invite_link = chat_export_invite_link
-
--- Get chat by invite link and joins if possible
-local function chat_import_invite_link(invite_link)
-  importChatInviteLink(invite_link)
-end
-
-M.chat_import_invite_link = chat_import_invite_link
-
--- Prints contact list
-local function contact_list(limit)
-  searchContacts("", limit)
-end
-
-M.contact_list = contact_list
-
--- Deletes user from contact list
-local function contact_delete(user_ids)
-  deleteContacts(user_ids)
-end
-
-M.contact_delete = contact_delete
-
--- Deletes message
-local function delete_msg(chat_id, message_ids)
-  deleteMessages(chat_id, message_ids)
-end
-
-M.delete_msg = delete_msg
-
--- List of last conversations
-local function dialog_list(limit)
-  searchChats('', limit)
-end
-
-M.dialog_list = dialog_list
-
--- Forwards message to peer. Forward to secret chats is forbidden
-local function fwd(chat_id, from_chat_id, message_ids)
-  forwardMessages(chat_id, from_chat_id, message_ids, 0)
-end
-
-M.fwd = fwd
-
--- Get message by id
-local function get_message(chat_id, message_id)
-  getMessage(chat_id, message_id)
-end
-
-M.get_message = get_message
-
--- Upgrades group to supergroup
-local function group_upgrade(chat_id)
-  migrateGroupChatToChannelChat(chat_id)
-end
-
-M.group_upgrade = group_upgrade
-
---  Prints messages with this peer. Also marks messages as read
-local function history(chat_id, limit, offset)
-  getChatHistory(chat_id, 0, offset, limit)
-end
-
-M.history = history
-
--- Marks messages with peer as read
-local function mark_read(chat_id, message_ids)
-  viewMessages(chat_id, message_ids)
-end
-
-M.mark_read = mark_read
-
--- Sends text message to peer
-local function msg(chat_id, text)
-  sendMessage(chat_id, 0, 0, text, 1)
-end
-
-M.msg = msg
-
--- mutes chat for specified number of seconds (default 60)
-local function mute(chat_id, mute_for)
-  setNotificationSettings('Chat', chat_id, mute_for or 60, 0)
-end
-
-M.mute = mute
-
---
-local function pin_message(channel_id, message_id, disable_notification)
-  pinChannelMessage(channel_id, message_id, disable_notification)
-end
-
-M.pin_message = pin_message
-
--- Tries to push inline button
-local function push_button(message, button_id)
-end
-
-M.push_button = push_button
-
--- Find chat by username
-local function resolve_username(username)
-  tdcli.searchChats(username, 20)
-end
-
-M.resolve_username = resolve_username
-
--- Sends text message to peer
-local function reply(chat_id, msg_id, text)
-  sendMessage(chat_id, msg_id, 0, text, 1)
-end
-
-M.reply = reply
-
--- Replies to peer with file
--- type = Animation|Audio|Document|Photo|Sticker|Video|Voice
-local function reply_file(chat_id, msg_id, type, file, caption)
   tdcli_function ({
     ID = "SendMessage",
     chat_id_ = chat_id,
-    reply_to_message_id_ = msg_id,
-    disable_notification_ = 0,
-    from_background_ = 1,
-    reply_markup_ = nil,
-    input_message_content_ = getInputMessageContent(file, type, caption),
-  }, dl_cb, nil)
-end
-
-M.reply_file = reply_file
-
--- Forwards message to peer. Forward to secret chats is forbidden
-local function reply_fwd(msg_id, fwd_id)
-end
-
-M.reply_fwd = reply_fwd
-
--- Sends geo location
-local function reply_location(chat_id, msg_id, latitude, longitude)
-  tdcli_function ({
-    ID="SendMessage",
-    chat_id_=chat_id,
-    reply_to_message_id_=msg_id,
-    disable_notification_=0,
-    from_background_=1,
-    reply_markup_=nil,
-    input_message_content_={
-      ID="InputMessageLocation",
-      location_={
-        ID = "Location",
-        latitude_ = latitude,
-        longitude_ = longitude
-      },
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageText",
+      text_ = text,
+      disable_web_page_preview_ = disable_web_page_preview,
+      clear_draft_ = 0,
+      entities_ = {},
+      parse_mode_ = TextParseMode,
     },
   }, dl_cb, nil)
 end
 
-M.reply_location = reply_location
+M.sendText = sendText
 
--- Search for pattern in messages from date from to date to (unixtime) in messages with peer (if peer not present, in all messages)
-local function search(chat_id, query, from_message_id, limit, filter)
-  searchChatMessages(chat_id, query, from_message_id, limit, filter)
-end
-
-M.search = search
-
--- Sends file to peer
--- type = Animation|Audio|Document|Photo|Sticker|Video|Voice
-local function send_file(chat_id, type, file, caption)
+-- Animation message
+-- @animation Animation file to send
+-- @thumb Animation thumb, if available
+-- @width Width of the animation, may be replaced by the server
+-- @height Height of the animation, may be replaced by the server 
+-- @caption Animation caption, 0-200 characters
+local function sendAnimation(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, animation, width, height, caption)
   tdcli_function ({
     ID = "SendMessage",
     chat_id_ = chat_id,
-    reply_to_message_id_ = 0,
-    disable_notification_ = 0,
-    from_background_ = 1,
-    reply_markup_ = nil,
-    input_message_content_ = getInputMessageContent(file, type, caption),
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageAnimation",
+      animation_ = getInputFile(animation),
+      --thumb_ = {
+        --ID = "InputThumb",
+        --path_ = path,
+        --width_ = width,
+        --height_ = height
+      --},
+      width_ = width or '',
+      height_ = height or '',
+      caption_ = caption or ''
+    },
   }, dl_cb, nil)
 end
 
-M.send_file = send_file
+M.sendAnimation = sendAnimation
 
--- Sends geo location
-local function send_location(chat_id, latitude, longitude)
+-- Audio message 
+-- @audio Audio file to send
+-- @album_cover_thumb Thumb of the album's cover, if available
+-- @duration Duration of audio in seconds, may be replaced by the server
+-- @title Title of the audio, 0-64 characters, may be replaced by the server
+-- @performer Performer of the audio, 0-64 characters, may be replaced by the server 
+-- @caption Audio caption, 0-200 characters
+local function sendAudio(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, audio, duration, title, performer, caption)
   tdcli_function ({
     ID = "SendMessage",
     chat_id_ = chat_id,
-    reply_to_message_id_ = 0,
-    disable_notification_ = 0,
-    from_background_ = 1,
-    reply_markup_ = nil,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageAudio",
+      audio_ = getInputFile(audio),
+      --album_cover_thumb_ = {
+        --ID = "InputThumb",
+        --path_ = path,
+        --width_ = width,
+        --height_ = height
+      --},
+      duration_ = duration or '',
+      title_ = title or '',
+      performer_ = performer or '',
+      caption_ = caption or ''
+    },
+  }, dl_cb, nil)
+end
+
+M.sendAudio = sendAudio
+
+-- Document message 
+-- @document Document to send
+-- @thumb Document thumb, if available 
+-- @caption Document caption, 0-200 characters
+local function sendDocument(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, document, caption)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageDocument",
+      document_ = getInputFile(document),
+      --thumb_ = {
+        --ID = "InputThumb",
+        --path_ = path,
+        --width_ = width,
+        --height_ = height
+      --},
+      caption_ = caption
+    },
+  }, dl_cb, nil)
+end
+
+M.sendDocument = sendDocument
+
+-- Photo message 
+-- @photo Photo to send 
+-- @caption Photo caption, 0-200 characters
+local function sendPhoto(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, photo, caption)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessagePhoto",
+      photo_ = getInputFile(photo),
+      caption_ = caption
+    },
+  }, dl_cb, nil)
+end
+
+M.sendPhoto = sendPhoto
+
+-- Sticker message 
+-- @sticker Sticker to send 
+-- @thumb Sticker thumb, if available
+local function sendSticker(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, sticker)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageSticker",
+      sticker_ = getInputFile(sticker),
+      --thumb_ = {
+        --ID = "InputThumb",
+        --path_ = path,
+        --width_ = width,
+        --height_ = height
+      --},
+    },
+  }, dl_cb, nil)
+end
+
+M.sendSticker = sendSticker
+
+-- Video message
+-- @video Video to send
+-- @thumb Video thumb, if available
+-- @duration Duration of video in seconds
+-- @width Video width
+-- @height Video height
+-- @caption Video caption, 0-200 characters
+local function sendVideo(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, video, duration, width, height, caption)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageVideo",
+      video_ = getInputFile(video),
+      --thumb_ = {
+        --ID = "InputThumb",
+        --path_ = path,
+        --width_ = width,
+        --height_ = height
+      --},
+      duration_ = duration or '',
+      width_ = width or '',
+      height_ = height or '',
+      caption_ = caption or ''
+    },
+  }, dl_cb, nil)
+end
+
+M.sendVideo = sendVideo
+
+-- Voice message 
+-- @voice Voice file to send 
+-- @duration Duration of voice in seconds 
+-- @waveform Waveform representation of the voice in 5-bit format 
+-- @caption Voice caption, 0-200 characters
+local function sendVoice(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, voice, duration, waveform, caption)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageVoice",
+      voice_ = getInputFile(voice),
+      duration_ = duration or '',
+      waveform_ = waveform or '',
+      caption_ = caption or ''
+    },
+  }, dl_cb, nil)
+end
+
+M.sendVoice = sendVoice
+
+-- Message with location 
+-- @location Location to send
+local function sendLocation(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, latitude, longitude)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
     input_message_content_ = {
       ID = "InputMessageLocation",
       location_ = {
@@ -2486,42 +2293,111 @@ local function send_location(chat_id, latitude, longitude)
   }, dl_cb, nil)
 end
 
-M.send_location = send_location
+M.sendLocation = sendLocation
 
--- Sends typing action.
--- action = Typing|Cancel|RecordVideo|UploadVideo|RecordVoice|UploadVoice|UploadPhoto|UploadDocument|GeoLocation|ChooseContact|StartPlayGame
-local function send_typing(chat_id, action, progress)
-  sendChatAction(chat_id, action, progress)
+-- Message with information about venue 
+-- @venue Venue to send
+-- @title Venue name as defined by sender 
+-- @address Venue address as defined by sender 
+-- @provider Provider of venue database as defined by sender. Only "foursquare" need to be supported currently
+-- @id Identifier of the venue in provider database as defined by sender
+local function sendVenue(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, latitude, longitude, title, address, id)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageVenue",
+      venue_ = {
+        ID = "Venue",
+        location_ = {
+          ID = "Location",
+          latitude_ = latitude,
+          longitude_ = longitude
+        },
+        title_ = title,
+        address_ = address,
+        provider_ = 'foursquare',
+        id_ = id
+      },
+    },
+  }, dl_cb, nil)
 end
 
-M.send_typing = send_typing
+M.sendVenue = sendVenue
 
--- Adds bot to chat
-local function start_bot(user_id, chat_id, data)
-  sendBotStartMessage(user_id, chat_id, 'start')
+-- User contact message 
+-- @contact Contact to send
+-- @phone_number User's phone number 
+-- @first_name User first name, 1-255 characters 
+-- @last_name User last name 
+-- @user_id User identifier if known, 0 otherwise
+local function sendContact(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, phone_number, first_name, last_name, user_id)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageContact",
+      contact_ = {
+        ID = "Contact",
+        phone_number_ = phone_number,
+        first_name_ = first_name,
+        last_name_ = last_name,
+        user_id_ = user_id
+      },
+    },
+  }, dl_cb, nil)
 end
 
-M.start_bot = start_bot
+M.sendContact = sendContact
 
--- sets timer (in seconds)
-local function timer(timeout)
-  setAlarm(timeout)
+-- Message with a game 
+-- @bot_user_id User identifier of a bot owned the game 
+-- @game_short_name Game short name
+local function sendGame(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, bot_user_id, game_short_name)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageGame",
+      bot_user_id_ = bot_user_id,
+      game_short_name_ = game_short_name
+    },
+  }, dl_cb, nil)
 end
 
-M.timer = timer
+M.sendGame = sendGame
 
--- Unblock user
-local function unblock_user(user_id)
-  unblockUser(user_id)
+-- Forwarded message 
+-- @from_chat_id Chat identifier of the message to forward 
+-- @message_id Identifier of the message to forward
+local function sendForwarded(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, from_chat_id, message_id)
+  tdcli_function ({
+    ID = "SendMessage",
+    chat_id_ = chat_id,
+    reply_to_message_id_ = reply_to_message_id,
+    disable_notification_ = disable_notification,
+    from_background_ = from_background,
+    reply_markup_ = reply_markup,
+    input_message_content_ = {
+      ID = "InputMessageForwarded",
+      from_chat_id_ = from_chat_id,
+      message_id_ = message_id
+    },
+  }, dl_cb, nil)
 end
 
-M.unblock_user = unblock_user
-
--- unmutes chat
-local function unmute(chat_id)
-  setNotificationSettings('Chat', chat_id, 0, 1)
-end
-
-M.unmute = unmute
+M.sendForwarded = sendForwarded
 
 return M
