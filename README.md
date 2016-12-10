@@ -174,7 +174,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getWallpapers](https://github.com/rizaumami/tdcli.lua/wiki/getWallpapers)
 - [ ] registerDevice
 - [x] [getDeviceTokens](https://github.com/rizaumami/tdcli.lua/wiki/getDeviceTokens)
-- [ ] setPrivacy
+- [x] [setPrivacy](https://github.com/rizaumami/tdcli.lua/wiki/setPrivacy)
 - [x] [getPrivacy](https://github.com/rizaumami/tdcli.lua/wiki/getPrivacy)
 - [x] [getOption](https://github.com/rizaumami/tdcli.lua/wiki/getOption)
 - [x] [setOption](https://github.com/rizaumami/tdcli.lua/wiki/setOption)
@@ -185,7 +185,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [changeChatReportSpamState](https://github.com/rizaumami/tdcli.lua/wiki/changeChatReportSpamState)
 - [ ] setBotUpdatesStatus
 - [x] [setAlarm](https://github.com/rizaumami/tdcli.lua/wiki/setAlarm)
-- [x] [sendtext](https://github.com/rizaumami/tdcli.lua/wiki/sendtext)
+- [x] [sendText](https://github.com/rizaumami/tdcli.lua/wiki/sendText)
 - [x] [sendAnimation](https://github.com/rizaumami/tdcli.lua/wiki/sendAnimation)
 - [x] [sendAudio](https://github.com/rizaumami/tdcli.lua/wiki/sendAudio)
 - [x] [sendDocument](https://github.com/rizaumami/tdcli.lua/wiki/sendDocument)

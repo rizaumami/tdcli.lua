@@ -3,17 +3,17 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
    MA 02110-1301, USA.
-   
+
 ]]--
 
 -- Vector example form is like this: {[0] = v} or {v1, v2, v3, [0] = v}
@@ -211,7 +211,7 @@ end
 
 M.setPassword = setPassword
 
--- Returns set up recovery email 
+-- Returns set up recovery email
 -- @password Current user password
 local function getRecoveryEmail(password)
   tdcli_function ({
@@ -391,16 +391,16 @@ end
 M.getFilePersistent = getFilePersistent
 
 -- BAD RESULT
--- Returns list of chats in the right order, chats are sorted by (order, chat_id) in decreasing order. 
--- For example, to get list of chats from the beginning, the offset_order should be equal 2^63 - 1 
--- @offset_order Chat order to return chats from 
--- @offset_chat_id Chat identifier to return chats from 
+-- Returns list of chats in the right order, chats are sorted by (order, chat_id) in decreasing order.
+-- For example, to get list of chats from the beginning, the offset_order should be equal 2^63 - 1
+-- @offset_order Chat order to return chats from
+-- @offset_chat_id Chat identifier to return chats from
 -- @limit Maximum number of chats to be returned
 local function getChats(offset_order, offset_chat_id, limit)
   if not limit or limit > 20 then
     limit = 20
   end
-  
+
   tdcli_function ({
     ID = "GetChats",
     offset_order_ = offset_order or 9223372036854775807,
@@ -447,7 +447,7 @@ local function searchChats(query, limit)
   if not limit or limit > 20 then
     limit = 20
   end
-  
+
   tdcli_function ({
     ID = "SearchChats",
     query_ = query,
@@ -499,7 +499,7 @@ local function getCommonChats(user_id, offset_chat_id, limit)
   if not limit or limit > 100 then
     limit = 100
   end
-  
+
   tdcli_function ({
     ID = "GetCommonChats",
     user_id_ = user_id,
@@ -523,7 +523,7 @@ local function getChatHistory(chat_id, from_message_id, offset, limit)
   if not limit or limit > 100 then
     limit = 100
   end
-  
+
   tdcli_function ({
     ID = "GetChatHistory",
     chat_id_ = chat_id,
@@ -587,7 +587,7 @@ local function searchMessages(query, offset_date, offset_chat_id, offset_message
   if not limit or limit > 100 then
     limit = 100
   end
-  
+
   tdcli_function ({
     ID = "SearchMessages",
     query_ = query,
@@ -839,6 +839,9 @@ M.answerInlineQuery = answerInlineQuery
 -- @chat_id Identifier of the chat with a message
 -- @message_id Identifier of the message, from which the query is originated
 -- @payload Query payload
+-- @text Text of the answer
+-- @show_alert If true, an alert should be shown to the user instead of a toast
+-- @url URL to be open
 local function getCallbackQueryAnswer(chat_id, message_id, text, show_alert, url)
   tdcli_function ({
     ID = "GetCallbackQueryAnswer",
@@ -1817,7 +1820,7 @@ local function getChannelMembers(channel_id, offset, filter, limit)
   if not limit or limit > 200 then
     limit = 200
   end
-  
+
   tdcli_function ({
     ID = "GetChannelMembers",
     channel_id_ = getChatId(channel_id).ID,
@@ -1882,31 +1885,65 @@ M.getDeviceTokens = getDeviceTokens
 -- Changes privacy settings
 -- @key Privacy key
 -- @rules New privacy rules
+-- @privacyKeyUserStatus Privacy key for managing visibility of the user status
+-- @privacyKeyChatInvite Privacy key for managing ability of invitation of the user to chats
+-- @privacyRuleAllowAll Rule to allow all users
+-- @privacyRuleAllowContacts Rule to allow all user contacts
+-- @privacyRuleAllowUsers Rule to allow specified users
+-- @user_ids User identifiers
+-- @privacyRuleDisallowAll Rule to disallow all users
+-- @privacyRuleDisallowContacts Rule to disallow all user contacts
+-- @privacyRuleDisallowUsers Rule to disallow all specified users
 -- key = UserStatus|ChatInvite
 -- rules = AllowAll|AllowContacts|AllowUsers(user_ids)|DisallowAll|DisallowContacts|DisallowUsers(user_ids)
-local function setPrivacy(key, rules, user_ids)
-  if user_ids and rules:match('Allow') then
-    rule = 'AllowUsers'
-  elseif user_ids and rules:match('Disallow') then
-    rule = 'DisallowUsers'
-  end
+local function setPrivacy(key, rule, allowed_user_ids, disallowed_user_ids)
+  local rules = {[0] = {ID = 'PrivacyRule' .. rule}}
 
+  if allowed_user_ids then
+    rules = {
+      {
+        ID = 'PrivacyRule' .. rule
+      },
+      [0] = {
+        ID = "PrivacyRuleAllowUsers",
+        user_ids_ = allowed_user_ids -- vector
+      },
+    }
+  end
+  if disallowed_user_ids then
+    rules = {
+      {
+        ID = 'PrivacyRule' .. rule
+      },
+      [0] = {
+        ID = "PrivacyRuleDisallowUsers",
+        user_ids_ = disallowed_user_ids -- vector
+      },
+    }
+  end
+  if allowed_user_ids and disallowed_user_ids then
+    rules = {
+      {
+        ID = 'PrivacyRule' .. rule
+      },
+      {
+        ID = "PrivacyRuleAllowUsers",
+        user_ids_ = allowed_user_ids
+      },
+      [0] = {
+        ID = "PrivacyRuleDisallowUsers",
+        user_ids_ = disallowed_user_ids
+      },
+    }
+  end
   tdcli_function ({
     ID = "SetPrivacy",
     key_ = {
-      ID = 'PrivacyKey' .. key,
+      ID = 'PrivacyKey' .. key
     },
     rules_ = {
-      ID = 'PrivacyRules',
-      rules_ = {
-        [0] = {
-          ID = 'PrivacyRule' .. rules,
-        },
-        {
-          ID = 'PrivacyRule' .. rule,
-          user_ids_ = user_ids
-        },
-      },
+      ID = "PrivacyRules",
+      rules_ = rules
     },
   }, dl_cb, nil)
 end
@@ -2043,7 +2080,7 @@ end
 
 M.setAlarm = setAlarm
 
--- Text message 
+-- Text message
 -- @text Text to send
 -- @disable_web_page_preview Pass true to disable rich preview for link in the message text
 -- @clear_draft Pass true if chat draft message should be deleted
@@ -2076,7 +2113,7 @@ M.sendText = sendText
 -- @animation Animation file to send
 -- @thumb Animation thumb, if available
 -- @width Width of the animation, may be replaced by the server
--- @height Height of the animation, may be replaced by the server 
+-- @height Height of the animation, may be replaced by the server
 -- @caption Animation caption, 0-200 characters
 local function sendAnimation(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, animation, width, height, caption)
   tdcli_function ({
@@ -2104,12 +2141,12 @@ end
 
 M.sendAnimation = sendAnimation
 
--- Audio message 
+-- Audio message
 -- @audio Audio file to send
 -- @album_cover_thumb Thumb of the album's cover, if available
 -- @duration Duration of audio in seconds, may be replaced by the server
 -- @title Title of the audio, 0-64 characters, may be replaced by the server
--- @performer Performer of the audio, 0-64 characters, may be replaced by the server 
+-- @performer Performer of the audio, 0-64 characters, may be replaced by the server
 -- @caption Audio caption, 0-200 characters
 local function sendAudio(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, audio, duration, title, performer, caption)
   tdcli_function ({
@@ -2138,9 +2175,9 @@ end
 
 M.sendAudio = sendAudio
 
--- Document message 
+-- Document message
 -- @document Document to send
--- @thumb Document thumb, if available 
+-- @thumb Document thumb, if available
 -- @caption Document caption, 0-200 characters
 local function sendDocument(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, document, caption)
   tdcli_function ({
@@ -2166,8 +2203,8 @@ end
 
 M.sendDocument = sendDocument
 
--- Photo message 
--- @photo Photo to send 
+-- Photo message
+-- @photo Photo to send
 -- @caption Photo caption, 0-200 characters
 local function sendPhoto(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, photo, caption)
   tdcli_function ({
@@ -2187,8 +2224,8 @@ end
 
 M.sendPhoto = sendPhoto
 
--- Sticker message 
--- @sticker Sticker to send 
+-- Sticker message
+-- @sticker Sticker to send
 -- @thumb Sticker thumb, if available
 local function sendSticker(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, sticker)
   tdcli_function ({
@@ -2247,10 +2284,10 @@ end
 
 M.sendVideo = sendVideo
 
--- Voice message 
--- @voice Voice file to send 
--- @duration Duration of voice in seconds 
--- @waveform Waveform representation of the voice in 5-bit format 
+-- Voice message
+-- @voice Voice file to send
+-- @duration Duration of voice in seconds
+-- @waveform Waveform representation of the voice in 5-bit format
 -- @caption Voice caption, 0-200 characters
 local function sendVoice(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, voice, duration, waveform, caption)
   tdcli_function ({
@@ -2272,8 +2309,9 @@ end
 
 M.sendVoice = sendVoice
 
--- Message with location 
--- @location Location to send
+-- Message with location
+-- @latitude Latitude of location in degrees as defined by sender
+-- @longitude Longitude of location in degrees as defined by sender
 local function sendLocation(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, latitude, longitude)
   tdcli_function ({
     ID = "SendMessage",
@@ -2295,10 +2333,12 @@ end
 
 M.sendLocation = sendLocation
 
--- Message with information about venue 
+-- Message with information about venue
 -- @venue Venue to send
--- @title Venue name as defined by sender 
--- @address Venue address as defined by sender 
+-- @latitude Latitude of location in degrees as defined by sender
+-- @longitude Longitude of location in degrees as defined by sender
+-- @title Venue name as defined by sender
+-- @address Venue address as defined by sender
 -- @provider Provider of venue database as defined by sender. Only "foursquare" need to be supported currently
 -- @id Identifier of the venue in provider database as defined by sender
 local function sendVenue(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, latitude, longitude, title, address, id)
@@ -2329,11 +2369,11 @@ end
 
 M.sendVenue = sendVenue
 
--- User contact message 
+-- User contact message
 -- @contact Contact to send
--- @phone_number User's phone number 
--- @first_name User first name, 1-255 characters 
--- @last_name User last name 
+-- @phone_number User's phone number
+-- @first_name User first name, 1-255 characters
+-- @last_name User last name
 -- @user_id User identifier if known, 0 otherwise
 local function sendContact(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, phone_number, first_name, last_name, user_id)
   tdcli_function ({
@@ -2358,8 +2398,8 @@ end
 
 M.sendContact = sendContact
 
--- Message with a game 
--- @bot_user_id User identifier of a bot owned the game 
+-- Message with a game
+-- @bot_user_id User identifier of a bot owned the game
 -- @game_short_name Game short name
 local function sendGame(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, bot_user_id, game_short_name)
   tdcli_function ({
@@ -2379,8 +2419,8 @@ end
 
 M.sendGame = sendGame
 
--- Forwarded message 
--- @from_chat_id Chat identifier of the message to forward 
+-- Forwarded message
+-- @from_chat_id Chat identifier of the message to forward
 -- @message_id Identifier of the message to forward
 local function sendForwarded(chat_id, reply_to_message_id, disable_notification, from_background, reply_markup, from_chat_id, message_id)
   tdcli_function ({
