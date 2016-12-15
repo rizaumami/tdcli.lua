@@ -191,7 +191,7 @@ end
 M.getPasswordState = getPasswordState
 
 -- Changes user password.
--- If new recovery email is specified, then error EMAIL_UNCONFIRMED is returned and password change will not be applied until email will be confirmed.
+-- If new recovery email is specified, then error EMAIL_UNCONFIRMED is returned and password change will not be applied until email confirmation.
 -- Application should call getPasswordState from time to time to check if email is already confirmed
 -- @old_password Old user password
 -- @new_password New user password, may be empty to remove the password
@@ -211,7 +211,8 @@ end
 
 M.setPassword = setPassword
 
--- Returns set up recovery email
+-- Returns set up recovery email.
+-- This method can be used to verify a password provided by the user 
 -- @password Current user password
 local function getRecoveryEmail(password)
   tdcli_function ({
@@ -222,7 +223,10 @@ end
 
 M.getRecoveryEmail = getRecoveryEmail
 
--- Changes user recovery email
+-- Changes user recovery email.
+-- If new recovery email is specified, then error EMAIL_UNCONFIRMED is returned and email will not be changed until email confirmation.
+-- Application should call getPasswordState from time to time to check if email is already confirmed.
+-- If new_recovery_email coincides with the current set up email succeeds immediately and aborts all other requests waiting for email confirmation
 -- @password Current user password
 -- @new_recovery_email New recovery email
 local function setRecoveryEmail(password, new_recovery_email)
@@ -329,6 +333,17 @@ local function getChannelFull(channel_id)
 end
 
 M.getChannelFull = getChannelFull
+
+-- Returns information about a secret chat by its identifier, offline request 
+-- @secret_chat_id Secret chat identifier
+local function getSecretChat(secret_chat_id)
+  tdcli_function ({
+    ID = "GetSecretChat",
+    secret_chat_id_ = secret_chat_id
+  }, dl_cb, nil)
+end
+
+M.getSecretChat = getSecretChat
 
 -- Returns information about a chat by its identifier, offline request if current user is not a bot
 -- @chat_id Chat identifier
@@ -576,8 +591,7 @@ end
 
 M.searchChatMessages = searchChatMessages
 
--- Searches for messages in all chats except secret.
--- Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id)
+-- Searches for messages in all chats except secret chats. Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id) 
 -- @query Query to search for
 -- @offset_date Date of the message to search from, you can use 0 or any date in the future to get results from the beginning
 -- @offset_chat_id Chat identifier of the last found message or 0 for the first request
@@ -602,7 +616,7 @@ M.searchMessages = searchMessages
 
 -- Invites bot to a chat (if it is not in the chat) and send /start to it.
 -- Bot can't be invited to a private chat other than chat with the bot.
--- Bots can't be invited to broadcast channel chats.
+-- Bots can't be invited to broadcast channel chats and secret chats.
 -- Returns sent message.
 -- UpdateChatTopMessage will not be sent, so returned message should be used to update chat top message
 -- @bot_user_id Identifier of the bot
@@ -626,7 +640,7 @@ M.sendBotStartMessage = sendBotStartMessage
 -- Always clears chat draft message
 -- @chat_id Chat to send message
 -- @reply_to_message_id Identifier of a message to reply to or 0
--- @disable_notification Pass true, to disable notification about the message
+-- @disable_notification Pass true, to disable notification about the message, doesn't works in secret chats 
 -- @from_background Pass true, if the message is sent from background
 -- @query_id Identifier of the inline query
 -- @result_id Identifier of the inline result
@@ -651,7 +665,7 @@ M.sendInlineQueryResultMessage = sendInlineQueryResultMessage
 -- @chat_id Identifier of a chat to forward messages
 -- @from_chat_id Identifier of a chat to forward from
 -- @message_ids Identifiers of messages to forward
--- @disable_notification Pass true, to disable notification about the message
+-- @disable_notification Pass true, to disable notification about the message, doesn't works if messages are forwarded to secret chat
 -- @from_background Pass true, if the message is sent from background
 local function forwardMessages(chat_id, from_chat_id, message_ids, disable_notification)
   tdcli_function ({
@@ -666,6 +680,19 @@ end
 
 M.forwardMessages = forwardMessages
 
+-- Changes current ttl setting in a secret chat and sends corresponding message 
+-- @chat_id Chat identifier 
+-- @ttl New value of ttl in seconds
+local function sendChatSetTtlMessage(chat_id, ttl)
+  tdcli_function ({
+    ID = "SendChatSetTtlMessage",
+    chat_id_ = chat_id,
+    ttl_ = ttl
+  }, dl_cb, nil)
+end
+
+M.sendChatSetTtlMessage = sendChatSetTtlMessage
+
 -- Deletes messages.
 -- UpdateDeleteMessages will not be sent for messages deleted through that function
 -- @chat_id Chat identifier
@@ -679,6 +706,20 @@ local function deleteMessages(chat_id, message_ids)
 end
 
 M.deleteMessages = deleteMessages
+
+-- Deletes all messages in the chat sent by the specified user.
+-- Works only in supergroup channel chats, needs appropriate privileges
+-- @chat_id Chat identifier
+-- @user_id User identifier
+local function deleteMessagesFromUser(chat_id, user_id)
+  tdcli_function ({
+    ID = "DeleteMessagesFromUser",
+    chat_id_ = chat_id,
+    user_id_ = user_id
+  }, dl_cb, nil)
+end
+
+M.deleteMessagesFromUser = deleteMessagesFromUser
 
 -- Edits text of text or game message.
 -- Non-bots can edit message in a limited period of time.
@@ -982,6 +1023,18 @@ end
 
 M.sendChatAction = sendChatAction
 
+-- Sends notification about screenshot taken in a chat.
+-- Works only in secret chats
+-- @chat_id Chat identifier
+local function sendChatScreenshotTakenNotification(chat_id)
+  tdcli_function ({
+    ID = "SendChatScreenshotTakenNotification",
+    chat_id_ = chat_id
+  }, dl_cb, nil)
+end
+
+M.sendChatScreenshotTakenNotification = sendChatScreenshotTakenNotification
+
 -- Chat is opened by the user.
 -- Many useful activities depends on chat being opened or closed. For example, in channels all updates are received only for opened chats
 -- @chat_id Chat identifier
@@ -1280,6 +1333,30 @@ end
 
 M.cancelDownloadFile = cancelDownloadFile
 
+-- Next part of a file was generated
+-- @generation_id Identifier of the generation process
+-- @ready Number of bytes already generated. Negative number means that generation has failed and should be terminated
+local function setFileGenerationProgress(generation_id, ready)
+  tdcli_function ({
+    ID = "SetFileGenerationProgress",
+    generation_id_ = generation_id,
+    ready_ = ready
+  }, dl_cb, nil)
+end
+
+M.setFileGenerationProgress = setFileGenerationProgress
+
+-- Finishes file generation
+-- @generation_id Identifier of the generation process
+local function finishFileGeneration(generation_id)
+  tdcli_function ({
+    ID = "FinishFileGeneration",
+    generation_id_ = generation_id
+  }, dl_cb, nil)
+end
+
+M.finishFileGeneration = finishFileGeneration
+
 -- Generates new chat invite link, previously generated link is revoked.
 -- Available for group and channel chats.
 -- Only creator of the chat can export chat invite link
@@ -1422,16 +1499,51 @@ end
 
 M.getStickers = getStickers
 
--- Returns list of installed sticker sets
--- @only_enabled If true, returns only enabled sticker sets
-local function getStickerSets(only_enabled)
+-- Returns list of installed sticker sets without archived sticker sets
+-- @is_masks Pass true to return masks, pass false to return stickers
+local function getStickerSets(is_masks)
   tdcli_function ({
     ID = "GetStickerSets",
-    only_enabled_ = only_enabled
+    is_masks_ = is_masks
   }, dl_cb, nil)
 end
 
 M.getStickerSets = getStickerSets
+
+-- Returns list of archived sticker sets
+-- @is_masks Pass true to return masks, pass false to return stickers 
+-- @offset_sticker_set_id Identifier of the sticker set from which return the result 
+-- @limit Maximum number of sticker sets to return
+local function getArchivedStickerSets(is_masks, offset_sticker_set_id, limit)
+  tdcli_function ({
+    ID = "GetArchivedStickerSets",
+    is_masks_ = is_masks,
+    offset_sticker_set_id_ = offset_sticker_set_id,
+    limit_ = limit
+  }, dl_cb, nil)
+end
+
+M.getArchivedStickerSets = getArchivedStickerSets
+
+-- Returns list of trending sticker sets
+local function getTrendingStickerSets()
+  tdcli_function ({
+    ID = "GetTrendingStickerSets"
+  }, dl_cb, nil)
+end
+
+M.getTrendingStickerSets = getTrendingStickerSets
+
+-- Returns list of sticker sets attached to a file, currently only photos and videos can have attached sticker sets
+-- @file_id File identifier
+local function getAttachedStickerSets(file_id)
+  tdcli_function ({
+    ID = "GetAttachedStickerSets",
+    file_id_ = file_id
+  }, dl_cb, nil)
+end
+
+M.getAttachedStickerSets = getAttachedStickerSets
 
 -- Returns information about sticker set by its identifier
 -- @set_id Identifier of the sticker set
@@ -1455,21 +1567,107 @@ end
 
 M.searchStickerSet = searchStickerSet
 
--- Installs/uninstalls or enables/archives sticker set.
--- Official sticker set can't be uninstalled, but it can be archived
+-- Installs/uninstalls or enables/archives sticker set. 
+-- Official sticker set can't be uninstalled, but it can be archived 
 -- @set_id Identifier of the sticker set
 -- @is_installed New value of is_installed
--- @is_enabled New value of is_enabled
-local function updateStickerSet(set_id, is_installed, is_enabled)
+-- @is_archived New value of is_archived
+local function updateStickerSet(set_id, is_installed, is_archived)
   tdcli_function ({
     ID = "UpdateStickerSet",
     set_id_ = set_id,
     is_installed_ = is_installed,
-    is_enabled_ = is_enabled
+    is_archived_ = is_archived
   }, dl_cb, nil)
 end
 
 M.updateStickerSet = updateStickerSet
+
+-- Trending sticker sets are viewed by the user
+-- @sticker_set_ids Identifiers of viewed trending sticker sets
+local function viewTrendingStickerSets(sticker_set_ids)
+  tdcli_function ({
+    ID = "ViewTrendingStickerSets",
+    sticker_set_ids_ = sticker_set_ids -- vector
+  }, dl_cb, nil)
+end
+
+M.viewTrendingStickerSets = viewTrendingStickerSets
+
+-- Changes the order of installed sticker sets
+-- @is_masks Pass true to change masks order, pass false to change stickers order 
+-- @sticker_set_ids Identifiers of installed sticker sets in the new right order
+local function reorderStickerSets(is_masks, sticker_set_ids)
+  tdcli_function ({
+    ID = "ReorderStickerSets",
+    is_masks_ = is_masks,
+    sticker_set_ids_ = sticker_set_ids -- vector
+  }, dl_cb, nil)
+end
+
+M.reorderStickerSets = reorderStickerSets
+
+-- Returns list of recently used stickers
+-- @is_attached Pass true to return stickers and masks recently attached to photo or video files, pass false to return recently sent stickers
+local function getRecentStickers(is_attached)
+  tdcli_function ({
+    ID = "GetRecentStickers",
+    is_attached_ = is_attached
+  }, dl_cb, nil)
+end
+
+M.getRecentStickers = getRecentStickers
+
+-- Manually adds new sticker to the list of recently used stickers. 
+-- New sticker is added to the beginning of the list.
+-- If the sticker is already in the list, at first it is removed from the list
+-- @is_attached Pass true to add the sticker to the list of stickers recently attached to photo or video files, pass false to add the sticker to the list of recently sent stickers 
+-- @sticker Sticker file to add
+local function addRecentSticker(is_attached, sticker)
+  tdcli_function ({
+    ID = "AddRecentSticker",
+    is_attached_ = is_attached,
+    sticker_ = getInputFile(sticker)
+  }, dl_cb, nil)
+end
+
+M.addRecentSticker = addRecentSticker
+
+-- Removes a sticker from the list of recently used stickers
+-- @sticker Sticker file to delete
+-- @is_attached Pass true to remove the sticker from the list of stickers recently attached to photo or video files, pass false to remove the sticker from the list of recently sent stickers
+-- @sticker Sticker file to delete
+local function deleteRecentSticker(is_attached, sticker)
+  tdcli_function ({
+    ID = "DeleteRecentSticker",
+    is_attached_ = is_attached,
+    sticker_ = getInputFile(sticker)
+  }, dl_cb, nil)
+end
+
+M.deleteRecentSticker = deleteRecentSticker
+
+-- Clears list of recently used stickers
+-- @is_attached Pass true to clear list of stickers recently attached to photo or video files, pass false to clear the list of recently sent stickers
+local function clearRecentStickers(is_attached)
+  tdcli_function ({
+    ID = "ClearRecentStickers",
+    is_attached_ = is_attached
+  }, dl_cb, nil)
+end
+
+M.clearRecentStickers = clearRecentStickers
+
+-- Returns emojis corresponding to a sticker
+-- @sticker Sticker file identifier
+local function getStickerEmojis(sticker)
+  tdcli_function ({
+    ID = "GetStickerEmojis",
+    sticker_ = getInputFile(sticker)
+  }, dl_cb, nil)
+end
+
+M.getStickerEmojis = getStickerEmojis
 
 -- Returns saved animations
 local function getSavedAnimations()
@@ -1480,10 +1678,10 @@ end
 
 M.getSavedAnimations = getSavedAnimations
 
--- Manually adds new animation to the list of saved animations.
--- New animation is added to the beginning of the list.
+-- Manually adds new animation to the list of saved animations. 
+-- New animation is added to the beginning of the list. 
 -- If the animation is already in the list, at first it is removed from the list.
--- Only video animations with MIME type "video/mp4" can be added to the list
+-- Only non-secret video animations with MIME type "video/mp4" can be added to the list
 -- @animation Animation file to add. Only known to server animations (i. e. successfully sent via message) can be added to the list
 local function addSavedAnimation(animation)
   tdcli_function ({
@@ -1526,7 +1724,7 @@ end
 
 M.getWebPagePreview = getWebPagePreview
 
--- Returns notification settings for given scope
+-- Returns notification settings for a given scope
 -- @scope Scope to return information about notification settings
 -- scope = Chat(chat_id)|PrivateChats|GroupChats|AllChats|
 local function getNotificationSettings(scope, chat_id)
@@ -1541,7 +1739,7 @@ end
 
 M.getNotificationSettings = getNotificationSettings
 
--- Changes notification settings for given scope
+-- Changes notification settings for a given scope
 -- @scope Scope to change notification settings
 -- @notification_settings New notification settings for given scope
 -- scope = Chat(chat_id)|PrivateChats|GroupChats|AllChats|
@@ -1562,6 +1760,16 @@ local function setNotificationSettings(scope, chat_id, mute_for, show_preview)
 end
 
 M.setNotificationSettings = setNotificationSettings
+
+-- Resets all notification settings to the default value. 
+-- By default the only muted chats are supergroups, sound is set to 'default' and message previews are showed
+local function resetAllNotificationSettings()
+  tdcli_function ({
+    ID = "ResetAllNotificationSettings"
+  }, dl_cb, nil)
+end
+
+M.resetAllNotificationSettings = resetAllNotificationSettings
 
 -- Uploads new profile photo for logged in user.
 -- Photo will not change until change will be synchronized with the server.
@@ -1848,6 +2056,26 @@ end
 
 M.deleteChannel = deleteChannel
 
+-- Returns list of created public channels
+local function getCreatedPublicChannels()
+  tdcli_function ({
+    ID = "GetCreatedPublicChannels"
+  }, dl_cb, nil)
+end
+  
+M.getCreatedPublicChannels = getCreatedPublicChannels
+
+-- Closes secret chat 
+-- @secret_chat_id Secret chat identifier
+local function closeSecretChat(secret_chat_id)
+  tdcli_function ({
+    ID = "CloseSecretChat",
+    secret_chat_id_ = secret_chat_id
+  }, dl_cb, nil)
+end
+
+M.closeSecretChat = closeSecretChat
+
 -- Returns user that can be contacted to get support
 local function getSupportUser()
   tdcli_function ({
@@ -2082,6 +2310,9 @@ M.setAlarm = setAlarm
 
 -- Text message
 -- @text Text to send
+-- @disable_notification Pass true, to disable notification about the message, doesn't works in secret chats
+-- @from_background Pass true, if the message is sent from background
+-- @reply_markup Bots only. Markup for replying to message
 -- @disable_web_page_preview Pass true to disable rich preview for link in the message text
 -- @clear_draft Pass true if chat draft message should be deleted
 -- @entities Bold, Italic, Code, Pre, PreCode and TextUrl entities contained in the text. Non-bot users can't use TextUrl entities. Can't be used with non-null parse_mode

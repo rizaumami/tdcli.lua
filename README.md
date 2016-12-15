@@ -44,7 +44,7 @@ end
 
 ## The Functions
 
-`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1124.tl](https://valtman.name/files/telegram-cli-1124.tl) scheme.  
+`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1215.tl](https://valtman.name/files/telegram-cli-1215.tl) scheme.  
 Here is a list of functions that's should works, and what left to be tested.
 
 - [x] [getAuthState](https://github.com/rizaumami/tdcli.lua/wiki/getAuthState)
@@ -69,6 +69,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getGroupFull](https://github.com/rizaumami/tdcli.lua/wiki/getGroupFull)
 - [x] [getChannel](https://github.com/rizaumami/tdcli.lua/wiki/getChannel)
 - [x] [getChannelFull](https://github.com/rizaumami/tdcli.lua/wiki/getChannelFull)
+- [ ] getSecretChat
 - [x] [getChat](https://github.com/rizaumami/tdcli.lua/wiki/getChat)
 - [x] [getMessage](https://github.com/rizaumami/tdcli.lua/wiki/getMessage)
 - [x] [getMessages](https://github.com/rizaumami/tdcli.lua/wiki/getMessages)
@@ -89,7 +90,9 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [sendBotStartMessage](https://github.com/rizaumami/tdcli.lua/wiki/sendBotStartMessage)
 - [ ] sendInlineQueryResultMessage
 - [x] [forwardMessages](https://github.com/rizaumami/tdcli.lua/wiki/forwardMessages)
+- [ ] sendChatSetTtlMessage
 - [x] [deleteMessages](https://github.com/rizaumami/tdcli.lua/wiki/deleteMessages)
+- [x] [deleteMessagesFromUser](https://github.com/rizaumami/tdcli.lua/wiki/deleteMessagesFromUser)
 - [x] [editMessageText](https://github.com/rizaumami/tdcli.lua/wiki/editMessageText)
 - [x] [editMessageCaption](https://github.com/rizaumami/tdcli.lua/wiki/editMessageCaption)
 - [ ] editMessageReplyMarkup
@@ -106,6 +109,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [ ] getInlineGameHighScores
 - [ ] deleteChatReplyMarkup
 - [x] [sendChatAction](https://github.com/rizaumami/tdcli.lua/wiki/sendChatAction)
+- [ ] [sendChatScreenshotTakenNotification](https://github.com/rizaumami/tdcli.lua/wiki/sendChatScreenshotTakenNotification)
 - [x] [openChat](https://github.com/rizaumami/tdcli.lua/wiki/openChat)
 - [x] [closeChat](https://github.com/rizaumami/tdcli.lua/wiki/closeChat)
 - [x] [viewMessages](https://github.com/rizaumami/tdcli.lua/wiki/viewMessages)
@@ -127,6 +131,8 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getChatMember](https://github.com/rizaumami/tdcli.lua/wiki/getChatMember)
 - [x] [downloadFile](https://github.com/rizaumami/tdcli.lua/wiki/downloadFile)
 - [x] [cancelDownloadFile](https://github.com/rizaumami/tdcli.lua/wiki/cancelDownloadFile)
+- [ ] setFileGenerationProgress
+- [ ] finishFileGeneration
 - [x] [exportChatInviteLink](https://github.com/rizaumami/tdcli.lua/wiki/exportChatInviteLink)
 - [x] [checkChatInviteLink](https://github.com/rizaumami/tdcli.lua/wiki/checkChatInviteLink)
 - [x] [importChatInviteLink](https://github.com/rizaumami/tdcli.lua/wiki/importChatInviteLink)
@@ -139,9 +145,19 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getUserProfilePhotos](https://github.com/rizaumami/tdcli.lua/wiki/getUserProfilePhotos)
 - [x] [getStickers](https://github.com/rizaumami/tdcli.lua/wiki/getStickers)
 - [x] [getStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getStickerSets)
+- [x] [getArchivedStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getArchivedStickerSets)
+- [x] [getTrendingStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getTrendingStickerSets)
+- getAttachedStickerSets
 - [x] [getStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/getStickerSet)
 - [x] [searchStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/searchStickerSet)
-- [ ] updateStickerSet
+- [x] [updateStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/updateStickerSet)
+- [ ] viewTrendingStickerSets
+- [ ] reorderStickerSets
+- [x] [getRecentStickers](https://github.com/rizaumami/tdcli.lua/wiki/getRecentStickers)
+- [x] [addRecentSticker](https://github.com/rizaumami/tdcli.lua/wiki/addRecentSticker)
+- [x] [deleteRecentSticker](https://github.com/rizaumami/tdcli.lua/wiki/deleteRecentSticker)
+- [x] [clearRecentStickers](https://github.com/rizaumami/tdcli.lua/wiki/clearRecentStickers)
+- [x] [getStickerEmojis](https://github.com/rizaumami/tdcli.lua/wiki/getStickerEmojis)
 - [x] [getSavedAnimations](https://github.com/rizaumami/tdcli.lua/wiki/getSavedAnimations)
 - [x] [addSavedAnimation](https://github.com/rizaumami/tdcli.lua/wiki/addSavedAnimation)
 - [x] [deleteSavedAnimation](https://github.com/rizaumami/tdcli.lua/wiki/deleteSavedAnimation)
@@ -149,6 +165,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getWebPagePreview](https://github.com/rizaumami/tdcli.lua/wiki/getWebPagePreview)
 - [x] [getNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/getNotificationSettings)
 - [x] [setNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/setNotificationSettings)
+- [ ] resetAllNotificationSettings
 - [x] [setProfilePhoto](https://github.com/rizaumami/tdcli.lua/wiki/setProfilePhoto)
 - [ ] deleteProfilePhoto
 - [x] [changeName](https://github.com/rizaumami/tdcli.lua/wiki/changeName)
@@ -170,6 +187,8 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [reportChannelSpam](https://github.com/rizaumami/tdcli.lua/wiki/reportChannelSpam)
 - [x] [getChannelMembers](https://github.com/rizaumami/tdcli.lua/wiki/getChannelMembers)
 - [x] [deleteChannel](https://github.com/rizaumami/tdcli.lua/wiki/deleteChannel)
+- [x] [getCreatedPublicChannels](https://github.com/rizaumami/tdcli.lua/wiki/getCreatedPublicChannels)
+- [ ] closeSecretChat
 - [x] [getSupportUser](https://github.com/rizaumami/tdcli.lua/wiki/getSupportUser)
 - [x] [getWallpapers](https://github.com/rizaumami/tdcli.lua/wiki/getWallpapers)
 - [ ] registerDevice
