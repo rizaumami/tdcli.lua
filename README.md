@@ -180,7 +180,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [setOption](https://github.com/rizaumami/tdcli.lua/wiki/setOption)
 - [x] [changeAccountTtl](https://github.com/rizaumami/tdcli.lua/wiki/changeAccountTtl)
 - [x] [getAccountTtl](https://github.com/rizaumami/tdcli.lua/wiki/getAccountTtl)
-- [ ] deleteAccount
+- [x] [deleteAccount](https://github.com/rizaumami/tdcli.lua/wiki/deleteAccount)
 - [x] [getChatReportSpamState](https://github.com/rizaumami/tdcli.lua/wiki/getChatReportSpamState)
 - [x] [changeChatReportSpamState](https://github.com/rizaumami/tdcli.lua/wiki/changeChatReportSpamState)
 - [ ] setBotUpdatesStatus
@@ -193,7 +193,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [sendSticker](https://github.com/rizaumami/tdcli.lua/wiki/sendSticker)
 - [x] [sendVideo](https://github.com/rizaumami/tdcli.lua/wiki/sendVideo)
 - [x] [sendVoice](https://github.com/rizaumami/tdcli.lua/wiki/sendVoice)
-- [x] [sendLocation](https://github.com/rizaumami/tdcli.lua/wiki/sendVoice)
+- [x] [sendLocation](https://github.com/rizaumami/tdcli.lua/wiki/sendLocation)
 - [x] [sendVenue](https://github.com/rizaumami/tdcli.lua/wiki/sendVenue)
 - [x] [sendContact](https://github.com/rizaumami/tdcli.lua/wiki/sendContact)
 - [x] [sendGame](https://github.com/rizaumami/tdcli.lua/wiki/sendGame)
