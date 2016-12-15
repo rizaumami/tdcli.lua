@@ -109,7 +109,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [ ] getInlineGameHighScores
 - [ ] deleteChatReplyMarkup
 - [x] [sendChatAction](https://github.com/rizaumami/tdcli.lua/wiki/sendChatAction)
-- [ ] [sendChatScreenshotTakenNotification](https://github.com/rizaumami/tdcli.lua/wiki/sendChatScreenshotTakenNotification)
+- [ ] sendChatScreenshotTakenNotification
 - [x] [openChat](https://github.com/rizaumami/tdcli.lua/wiki/openChat)
 - [x] [closeChat](https://github.com/rizaumami/tdcli.lua/wiki/closeChat)
 - [x] [viewMessages](https://github.com/rizaumami/tdcli.lua/wiki/viewMessages)
@@ -147,7 +147,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getStickerSets)
 - [x] [getArchivedStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getArchivedStickerSets)
 - [x] [getTrendingStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/getTrendingStickerSets)
-- getAttachedStickerSets
+- [ ] getAttachedStickerSets
 - [x] [getStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/getStickerSet)
 - [x] [searchStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/searchStickerSet)
 - [x] [updateStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/updateStickerSet)
@@ -167,7 +167,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [setNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/setNotificationSettings)
 - [ ] resetAllNotificationSettings
 - [x] [setProfilePhoto](https://github.com/rizaumami/tdcli.lua/wiki/setProfilePhoto)
-- [ ] deleteProfilePhoto
+- [x] [deleteProfilePhoto](https://github.com/rizaumami/tdcli.lua/wiki/deleteProfilePhoto)
 - [x] [changeName](https://github.com/rizaumami/tdcli.lua/wiki/changeName)
 - [x] [changeAbout](https://github.com/rizaumami/tdcli.lua/wiki/changeAbout)
 - [x] [changeUsername](https://github.com/rizaumami/tdcli.lua/wiki/changeUsername)
@@ -175,8 +175,8 @@ Here is a list of functions that's should works, and what left to be tested.
 - [ ] resendChangePhoneNumberCode
 - [ ] checkChangePhoneNumberCode
 - [x] [getActiveSessions](https://github.com/rizaumami/tdcli.lua/wiki/getActiveSessions)
-- [ ] terminateSession
-- [ ] terminateAllOtherSessions
+- [x] [terminateSession](https://github.com/rizaumami/tdcli.lua/wiki/terminateSession)
+- [x] [terminateAllOtherSessions](https://github.com/rizaumami/tdcli.lua/wiki/terminateAllOtherSessions)
 - [x] [toggleGroupEditors](https://github.com/rizaumami/tdcli.lua/wiki/toggleGroupEditors)
 - [x] [changeChannelUsername](https://github.com/rizaumami/tdcli.lua/wiki/changeChannelUsername)
 - [x] [toggleChannelInvites](https://github.com/rizaumami/tdcli.lua/wiki/toggleChannelInvites)
