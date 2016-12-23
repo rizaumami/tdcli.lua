@@ -108,7 +108,8 @@ M.resendAuthCode = resendAuthCode
 -- Works only when authGetState returns authStateWaitCode.
 -- Returns authStateWaitPassword or authStateOk on success
 -- @code Verification code from SMS, Telegram message, voice call or flash call
--- @first_name User first name, if user is yet not registered, 1-255 characters @last_name Optional user last name, if user is yet not registered, 0-255 characters
+-- @first_name User first name, if user is yet not registered, 1-255 characters
+-- @last_name Optional user last name, if user is yet not registered, 0-255 characters
 local function checkAuthCode(code, first_name, last_name)
   tdcli_function ({
     ID = "CheckAuthCode",
@@ -122,7 +123,8 @@ M.checkAuthCode = checkAuthCode
 
 -- Checks password for correctness.
 -- Works only when authGetState returns authStateWaitPassword.
--- Returns authStateOk on success @password Password to check
+-- Returns authStateOk on success
+-- @password Password to check
 local function checkAuthPassword(password)
   tdcli_function ({
     ID = "CheckAuthPassword",
@@ -145,7 +147,8 @@ M.requestAuthPasswordRecovery = requestAuthPasswordRecovery
 
 -- Recovers password with recovery code sent to email.
 -- Works only when authGetState returns authStateWaitPassword.
--- Returns authStateOk on success @recovery_code Recovery code to check
+-- Returns authStateOk on success
+-- @recovery_code Recovery code to check
 local function recoverAuthPassword(recovery_code)
   tdcli_function ({
     ID = "RecoverAuthPassword",
@@ -171,7 +174,8 @@ M.resetAuth = resetAuth
 -- Check bot's authentication token to log in as a bot.
 -- Works only when authGetState returns authStateWaitPhoneNumber.
 -- Can be used instead of setAuthPhoneNumber and checkAuthCode to log in.
--- Returns authStateOk on success @token Bot token
+-- Returns authStateOk on success
+-- @token Bot token
 local function checkAuthBotToken(token)
   tdcli_function ({
     ID = "CheckAuthBotToken",
@@ -212,7 +216,7 @@ end
 M.setPassword = setPassword
 
 -- Returns set up recovery email.
--- This method can be used to verify a password provided by the user 
+-- This method can be used to verify a password provided by the user
 -- @password Current user password
 local function getRecoveryEmail(password)
   tdcli_function ({
@@ -334,7 +338,7 @@ end
 
 M.getChannelFull = getChannelFull
 
--- Returns information about a secret chat by its identifier, offline request 
+-- Returns information about a secret chat by its identifier, offline request
 -- @secret_chat_id Secret chat identifier
 local function getSecretChat(secret_chat_id)
   tdcli_function ({
@@ -405,7 +409,6 @@ end
 
 M.getFilePersistent = getFilePersistent
 
--- BAD RESULT
 -- Returns list of chats in the right order, chats are sorted by (order, chat_id) in decreasing order.
 -- For example, to get list of chats from the beginning, the offset_order should be equal 2^63 - 1
 -- @offset_order Chat order to return chats from
@@ -568,7 +571,8 @@ M.deleteChatHistory = deleteChatHistory
 -- Returns result in reverse chronological order, i. e. in order of decreasimg message_id.
 -- Doesn't work in secret chats
 -- @chat_id Chat identifier to search in
--- @query Query to search for @from_message_id Identifier of the message from which we need a history, you can use 0 to get results from beginning
+-- @query Query to search for
+-- @from_message_id Identifier of the message from which we need a history, you can use 0 to get results from beginning
 -- @limit Maximum number of messages to be returned, can't be greater than 100
 -- @filter Filter for content of searched messages
 -- filter = Empty|Animation|Audio|Document|Photo|Video|Voice|PhotoAndVideo|Url|ChatPhoto
@@ -591,7 +595,7 @@ end
 
 M.searchChatMessages = searchChatMessages
 
--- Searches for messages in all chats except secret chats. Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id) 
+-- Searches for messages in all chats except secret chats. Returns result in reverse chronological order, i. e. in order of decreasing (date, chat_id, message_id)
 -- @query Query to search for
 -- @offset_date Date of the message to search from, you can use 0 or any date in the future to get results from the beginning
 -- @offset_chat_id Chat identifier of the last found message or 0 for the first request
@@ -640,7 +644,7 @@ M.sendBotStartMessage = sendBotStartMessage
 -- Always clears chat draft message
 -- @chat_id Chat to send message
 -- @reply_to_message_id Identifier of a message to reply to or 0
--- @disable_notification Pass true, to disable notification about the message, doesn't works in secret chats 
+-- @disable_notification Pass true, to disable notification about the message, doesn't works in secret chats
 -- @from_background Pass true, if the message is sent from background
 -- @query_id Identifier of the inline query
 -- @result_id Identifier of the inline result
@@ -680,8 +684,8 @@ end
 
 M.forwardMessages = forwardMessages
 
--- Changes current ttl setting in a secret chat and sends corresponding message 
--- @chat_id Chat identifier 
+-- Changes current ttl setting in a secret chat and sends corresponding message
+-- @chat_id Chat identifier
 -- @ttl New value of ttl in seconds
 local function sendChatSetTtlMessage(chat_id, ttl)
   tdcli_function ({
@@ -749,8 +753,13 @@ end
 
 M.editMessageText = editMessageText
 
--- Edits message content caption. Non-bots can edit message in a limited period of time. Returns edited message after edit is complete server side
--- @chat_id Chat the message belongs to @message_id Identifier of the message @reply_markup Bots only. New message reply markup @caption New message content caption, 0-200 characters
+-- Edits message content caption.
+-- Non-bots can edit message in a limited period of time.
+-- Returns edited message after edit is complete server side
+-- @chat_id Chat the message belongs to
+-- @message_id Identifier of the message
+-- @reply_markup Bots only. New message reply markup
+-- @caption New message content caption, 0-200 characters
 local function editMessageCaption(chat_id, message_id, reply_markup, caption)
   tdcli_function ({
     ID = "EditMessageCaption",
@@ -802,7 +811,11 @@ end
 
 M.editInlineMessageText = editInlineMessageText
 
--- Bots only. Edits caption of an inline message content sent via bot @inline_message_id Inline message identifier @reply_markup New message reply markup @caption New message content caption, 0-200 characters
+-- Bots only.
+-- Edits caption of an inline message content sent via bot
+-- @inline_message_id Inline message identifier
+-- @reply_markup New message reply markup
+-- @caption New message content caption, 0-200 characters
 local function editInlineMessageCaption(inline_message_id, reply_markup, caption)
   tdcli_function ({
     ID = "EditInlineMessageCaption",
@@ -833,7 +846,8 @@ M.editInlineMessageReplyMarkup = editInlineMessageReplyMarkup
 -- Unavailable for bots
 -- @bot_user_id Identifier of the bot send query to
 -- @chat_id Identifier of the chat, where the query is sent
--- @user_location User location, only if needed @query Text of the query
+-- @user_location User location, only if needed
+-- @query Text of the query
 -- @offset Offset of the first entry to return
 local function getInlineQueryResults(bot_user_id, chat_id, latitude, longitude, query, offset)
   tdcli_function ({
@@ -856,7 +870,8 @@ M.getInlineQueryResults = getInlineQueryResults
 -- Sets result of the inline query
 -- @inline_query_id Identifier of the inline query
 -- @is_personal Does result of the query can be cached only for specified user
--- @results Results of the query @cache_time Allowed time to cache results of the query in seconds
+-- @results Results of the query
+-- @cache_time Allowed time to cache results of the query in seconds
 -- @next_offset Offset for the next inline query, pass empty string if there is no more results
 -- @switch_pm_text If non-empty, this text should be shown on the button, which opens private chat with the bot and sends bot start message with parameter switch_pm_parameter
 -- @switch_pm_parameter Parameter for the bot start message
@@ -1201,7 +1216,8 @@ M.changeChatTitle = changeChatTitle
 -- Photo can't be changed for private chats.
 -- Photo will not change until change will be synchronized with the server.
 -- Photo will not be changed if application is killed before it can send request to the server.
--- There will be update about change of the photo on success. Otherwise error will be returned @chat_id Chat identifier
+-- There will be update about change of the photo on success. Otherwise error will be returned
+-- @chat_id Chat identifier
 -- @photo New chat photo. You can use zero InputFileId to delete photo. Files accessible only by HTTP URL are not acceptable
 local function changeChatPhoto(chat_id, photo)
   tdcli_function ({
@@ -1511,8 +1527,8 @@ end
 M.getStickerSets = getStickerSets
 
 -- Returns list of archived sticker sets
--- @is_masks Pass true to return masks, pass false to return stickers 
--- @offset_sticker_set_id Identifier of the sticker set from which return the result 
+-- @is_masks Pass true to return masks, pass false to return stickers
+-- @offset_sticker_set_id Identifier of the sticker set from which return the result
 -- @limit Maximum number of sticker sets to return
 local function getArchivedStickerSets(is_masks, offset_sticker_set_id, limit)
   tdcli_function ({
@@ -1567,8 +1583,8 @@ end
 
 M.searchStickerSet = searchStickerSet
 
--- Installs/uninstalls or enables/archives sticker set. 
--- Official sticker set can't be uninstalled, but it can be archived 
+-- Installs/uninstalls or enables/archives sticker set.
+-- Official sticker set can't be uninstalled, but it can be archived
 -- @set_id Identifier of the sticker set
 -- @is_installed New value of is_installed
 -- @is_archived New value of is_archived
@@ -1595,7 +1611,7 @@ end
 M.viewTrendingStickerSets = viewTrendingStickerSets
 
 -- Changes the order of installed sticker sets
--- @is_masks Pass true to change masks order, pass false to change stickers order 
+-- @is_masks Pass true to change masks order, pass false to change stickers order
 -- @sticker_set_ids Identifiers of installed sticker sets in the new right order
 local function reorderStickerSets(is_masks, sticker_set_ids)
   tdcli_function ({
@@ -1618,10 +1634,10 @@ end
 
 M.getRecentStickers = getRecentStickers
 
--- Manually adds new sticker to the list of recently used stickers. 
+-- Manually adds new sticker to the list of recently used stickers.
 -- New sticker is added to the beginning of the list.
 -- If the sticker is already in the list, at first it is removed from the list
--- @is_attached Pass true to add the sticker to the list of stickers recently attached to photo or video files, pass false to add the sticker to the list of recently sent stickers 
+-- @is_attached Pass true to add the sticker to the list of stickers recently attached to photo or video files, pass false to add the sticker to the list of recently sent stickers
 -- @sticker Sticker file to add
 local function addRecentSticker(is_attached, sticker)
   tdcli_function ({
@@ -1634,7 +1650,6 @@ end
 M.addRecentSticker = addRecentSticker
 
 -- Removes a sticker from the list of recently used stickers
--- @sticker Sticker file to delete
 -- @is_attached Pass true to remove the sticker from the list of stickers recently attached to photo or video files, pass false to remove the sticker from the list of recently sent stickers
 -- @sticker Sticker file to delete
 local function deleteRecentSticker(is_attached, sticker)
@@ -1678,8 +1693,8 @@ end
 
 M.getSavedAnimations = getSavedAnimations
 
--- Manually adds new animation to the list of saved animations. 
--- New animation is added to the beginning of the list. 
+-- Manually adds new animation to the list of saved animations.
+-- New animation is added to the beginning of the list.
 -- If the animation is already in the list, at first it is removed from the list.
 -- Only non-secret video animations with MIME type "video/mp4" can be added to the list
 -- @animation Animation file to add. Only known to server animations (i. e. successfully sent via message) can be added to the list
@@ -1761,7 +1776,7 @@ end
 
 M.setNotificationSettings = setNotificationSettings
 
--- Resets all notification settings to the default value. 
+-- Resets all notification settings to the default value.
 -- By default the only muted chats are supergroups, sound is set to 'default' and message previews are showed
 local function resetAllNotificationSettings()
   tdcli_function ({
@@ -2062,10 +2077,10 @@ local function getCreatedPublicChannels()
     ID = "GetCreatedPublicChannels"
   }, dl_cb, nil)
 end
-  
+
 M.getCreatedPublicChannels = getCreatedPublicChannels
 
--- Closes secret chat 
+-- Closes secret chat
 -- @secret_chat_id Secret chat identifier
 local function closeSecretChat(secret_chat_id)
   tdcli_function ({
@@ -2094,14 +2109,25 @@ end
 
 M.getWallpapers = getWallpapers
 
-local function registerDevice()
+-- Registers current used device for receiving push notifications
+-- @device_token Device token
+-- device_token = apns|gcm|mpns|simplePush|ubuntuPhone|blackberry
+local function registerDevice(device_token, token, device_token_set)
+  local dToken = {ID = device_token .. 'DeviceToken', token_ = token}
+
+  if device_token_set then
+    dToken = {ID = "DeviceTokenSet", token_ = device_token_set} -- tokens:vector<DeviceToken>
+  end
+
   tdcli_function ({
     ID = "RegisterDevice",
+    device_token_ = dToken
   }, dl_cb, nil)
 end
 
 M.registerDevice = registerDevice
 
+-- Returns list of used device tokens
 local function getDeviceTokens()
   tdcli_function ({
     ID = "GetDeviceTokens",

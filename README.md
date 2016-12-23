@@ -18,14 +18,17 @@ end
 function tdcli_update_callback(data)
   if (data.ID == "UpdateNewMessage") then
     local msg = data.message_
+    local input = msg.content_.text_
+    local chat_id = msg.chat_id_
+    local user_id = msg.sender_user_id_
     -- If the message is text message
     if msg.content_.ID == "MessageText" then
       -- And the text is...
-      if msg.content_.text_ == "ping" then
+      if input == "ping" then
         -- Reply with unformatted text
         tdcli.sendText(chat_id, msg.id_, 0, 1, nil, 'pong', 1, 'html')
       -- And if the text is...
-      elseif msg.content_.text_ == "PING" then
+      elseif input == "PING" then
         -- Reply with formatted text
         tdcli.sendText(chat_id, msg.id_, 0, 1, nil, '<b>PONG</b>', 1, 'html')
       end
@@ -44,7 +47,7 @@ end
 
 ## The Functions
 
-`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1215.tl](https://valtman.name/files/telegram-cli-1215.tl) scheme.  
+`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1222.tl](https://valtman.name/files/telegram-cli-1222.tl) scheme.  
 Here is a list of functions that's should works, and what left to be tested.
 
 - [x] [getAuthState](https://github.com/rizaumami/tdcli.lua/wiki/getAuthState)
