@@ -154,7 +154,7 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/getStickerSet)
 - [x] [searchStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/searchStickerSet)
 - [x] [updateStickerSet](https://github.com/rizaumami/tdcli.lua/wiki/updateStickerSet)
-- [ ] viewTrendingStickerSets
+- [x] [viewTrendingStickerSets](https://github.com/rizaumami/tdcli.lua/wiki/viewTrendingStickerSets)
 - [ ] reorderStickerSets
 - [x] [getRecentStickers](https://github.com/rizaumami/tdcli.lua/wiki/getRecentStickers)
 - [x] [addRecentSticker](https://github.com/rizaumami/tdcli.lua/wiki/addRecentSticker)
@@ -168,15 +168,15 @@ Here is a list of functions that's should works, and what left to be tested.
 - [x] [getWebPagePreview](https://github.com/rizaumami/tdcli.lua/wiki/getWebPagePreview)
 - [x] [getNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/getNotificationSettings)
 - [x] [setNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/setNotificationSettings)
-- [ ] resetAllNotificationSettings
+- [x] [resetAllNotificationSettings](https://github.com/rizaumami/tdcli.lua/wiki/resetAllNotificationSettings)
 - [x] [setProfilePhoto](https://github.com/rizaumami/tdcli.lua/wiki/setProfilePhoto)
 - [x] [deleteProfilePhoto](https://github.com/rizaumami/tdcli.lua/wiki/deleteProfilePhoto)
 - [x] [changeName](https://github.com/rizaumami/tdcli.lua/wiki/changeName)
 - [x] [changeAbout](https://github.com/rizaumami/tdcli.lua/wiki/changeAbout)
 - [x] [changeUsername](https://github.com/rizaumami/tdcli.lua/wiki/changeUsername)
 - [x] [changePhoneNumber](https://github.com/rizaumami/tdcli.lua/wiki/changePhoneNumber)
-- [ ] resendChangePhoneNumberCode
-- [ ] checkChangePhoneNumberCode
+- [x] [resendChangePhoneNumberCode](https://github.com/rizaumami/tdcli.lua/wiki/resendChangePhoneNumberCode)
+- [x] [checkChangePhoneNumberCode](https://github.com/rizaumami/tdcli.lua/wiki/checkChangePhoneNumberCode)
 - [x] [getActiveSessions](https://github.com/rizaumami/tdcli.lua/wiki/getActiveSessions)
 - [x] [terminateSession](https://github.com/rizaumami/tdcli.lua/wiki/terminateSession)
 - [x] [terminateAllOtherSessions](https://github.com/rizaumami/tdcli.lua/wiki/terminateAllOtherSessions)

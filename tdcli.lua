@@ -2474,6 +2474,9 @@ local function sendPhoto(chat_id, reply_to_message_id, disable_notification, fro
     input_message_content_ = {
       ID = "InputMessagePhoto",
       photo_ = getInputFile(photo),
+      added_sticker_file_ids_ = {},
+      width_ = 0,
+      height_ = 0,
       caption_ = caption
     },
   }, dl_cb, nil)
