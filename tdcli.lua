@@ -2534,6 +2534,7 @@ local function sendVideo(chat_id, reply_to_message_id, disable_notification, fro
         --width_ = width,
         --height_ = height
       --},
+      added_sticker_file_ids_ = {},
       duration_ = duration or '',
       width_ = width or '',
       height_ = height or '',
