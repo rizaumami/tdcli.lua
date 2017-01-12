@@ -1,9 +1,11 @@
 # tdcli.lua
 A simple Lua library for the [`telegram-cli`](https://valtman.name/telegram-cli).
 
+See [wiki](https://github.com/rizaumami/tdcli.lua/wiki) for documentation.
+
 ## How to Use
 
-See example script below.  
+See example script below.
 - Place this `tdcli.lua` file inside the same folder as your bot, or anywhere else as long as you import it properly.
 - Import it into your bot.
 - Call a function.
@@ -12,7 +14,15 @@ See example script below.
 -- Load tdcli library.
 local tdcli = require('tdcli')
 
+-- It's do nothing but suppress 'lua: attempt to call a nil value' warning
 function dl_cb(arg, data)
+end
+
+-- An alias to sendText
+function sendText(chat_id, reply_to_message_id, text, disable_web_page_preview, parse_mode)
+  local parse_mode = parse_mode or 'HTML'
+  local disable_web_page_preview = disable_web_page_preview or 1
+  tdcli.sendText(chat_id, reply_to_message_id, 0, 1, nil, text, disable_web_page_preview, parse_mode)
 end
 
 function tdcli_update_callback(data)
@@ -26,11 +36,11 @@ function tdcli_update_callback(data)
       -- And the text is...
       if input == "ping" then
         -- Reply with unformatted text
-        tdcli.sendText(chat_id, msg.id_, 0, 1, nil, 'pong', 1, 'html')
+        sendText(chat_id, msg.id_, 'pong')
       -- And if the text is...
       elseif input == "PING" then
         -- Reply with formatted text
-        tdcli.sendText(chat_id, msg.id_, 0, 1, nil, '<b>PONG</b>', 1, 'html')
+        sendText(user_id, 0, '*PONG*', 1, 'Markdown')
       end
     end
   elseif (data.ID == "UpdateOption" and data.name_ == "my_id") then
@@ -47,7 +57,7 @@ end
 
 ## The Functions
 
-`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1222.tl](https://valtman.name/files/telegram-cli-1222.tl) scheme.  
+`tdcli.lua` is a Work In Progress. This commit is based on [telegram-cli-1222.tl](https://valtman.name/files/telegram-cli-1222.tl) scheme.
 Here is a list of functions that's should works, and what left to be tested.
 
 - [x] [getAuthState](https://github.com/rizaumami/tdcli.lua/wiki/getAuthState)
