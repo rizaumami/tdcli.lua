@@ -12,11 +12,7 @@ See example script below.
 
 ```lua
 -- Load tdcli library.
-local tdcli = require('tdcli')
-
--- It's do nothing but suppress 'lua: attempt to call a nil value' warning
-function dl_cb(arg, data)
-end
+tdcli = require('tdcli')
 
 -- An alias to sendText
 function sendText(chat_id, reply_to_message_id, text, disable_web_page_preview, parse_mode)
