@@ -45,9 +45,11 @@ local function getChatId(chat_id)
 end
 
 local function getInputFile(file)
-  if file:match('/') then
+  local input = tostring(file)
+
+  if input:match('/') then
     infile = {ID = "InputFileLocal", path_ = file}
-  elseif file:match('^%d+$') then
+  elseif input:match('^%d+$') then
     infile = {ID = "InputFileId", id_ = file}
   else
     infile = {ID = "InputFilePersistentId", persistent_id_ = file}
@@ -268,7 +270,7 @@ end
 M.recoverPassword = recoverPassword
 
 -- Returns current logged in user
-local function getMe(dl_cb, cmd)
+local function getMe(cb, cmd)
   tdcli_function ({
     ID = "GetMe",
   }, cb or dl_cb, cmd)
@@ -2393,9 +2395,9 @@ local function sendAnimation(chat_id, reply_to_message_id, disable_notification,
         --width_ = width,
         --height_ = height
       --},
-      width_ = width or '',
-      height_ = height or '',
-      caption_ = caption or ''
+      width_ = 0,
+      height_ = 0,
+      caption_ = caption
     },
   }, cb or dl_cb, cmd)
 end
@@ -2426,10 +2428,10 @@ local function sendAudio(chat_id, reply_to_message_id, disable_notification, fro
         --width_ = width,
         --height_ = height
       --},
-      duration_ = duration or '',
-      title_ = title or '',
-      performer_ = performer or '',
-      caption_ = caption or ''
+      duration_ = duration or 0,
+      title_ = title or 0,
+      performer_ = performer,
+      caption_ = caption
     },
   }, cb or dl_cb, cmd)
 end
@@ -2508,6 +2510,8 @@ local function sendSticker(chat_id, reply_to_message_id, disable_notification, f
         --width_ = width,
         --height_ = height
       --},
+      width_ = 0,
+      height_ = 0
     },
   }, cb or dl_cb, cmd)
 end
@@ -2539,10 +2543,10 @@ local function sendVideo(chat_id, reply_to_message_id, disable_notification, fro
         --height_ = height
       --},
       added_sticker_file_ids_ = {},
-      duration_ = duration or '',
-      width_ = width or '',
-      height_ = height or '',
-      caption_ = caption or ''
+      duration_ = duration or 0,
+      width_ = width or 0,
+      height_ = height or 0,
+      caption_ = caption
     },
   }, cb or dl_cb, cmd)
 end
@@ -2565,9 +2569,9 @@ local function sendVoice(chat_id, reply_to_message_id, disable_notification, fro
     input_message_content_ = {
       ID = "InputMessageVoice",
       voice_ = getInputFile(voice),
-      duration_ = duration or '',
-      waveform_ = waveform or '',
-      caption_ = caption or ''
+      duration_ = duration or 0,
+      waveform_ = waveform,
+      caption_ = caption
     },
   }, cb or dl_cb, cmd)
 end
@@ -2698,7 +2702,8 @@ local function sendForwarded(chat_id, reply_to_message_id, disable_notification,
     input_message_content_ = {
       ID = "InputMessageForwarded",
       from_chat_id_ = from_chat_id,
-      message_id_ = message_id
+      message_id_ = message_id,
+      in_game_share_ = in_game_share
     },
   }, cb or dl_cb, cmd)
 end
