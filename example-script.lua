@@ -2,7 +2,7 @@
 -- written to demonstrate how to use tdlib.lua for your telegram-cli bot.
 
 -- Load tdcli library.
-tdcli = dofile('tdcli.lua')
+tdcli = require 'tdcli'
 
 -- Print message format. Use serpent for prettier result.
 function vardump(value, depth, key)
@@ -60,11 +60,11 @@ function tdcli_update_callback(data)
       -- And content of the text is...
       if msg.content_.text_ == "ping" then
         -- Reply with regular text
-        tdcli.sendMessage(msg.chat_id_, msg.id_, 1, 'pong', 1)
+        tdcli.sendText(msg.chat_id_, msg.id_, 0, 1, nil, 'pong', 1)
       -- And if content of the text is...
       elseif msg.content_.text_ == "PING" then
         -- Reply with formatted text
-        tdcli.sendMessage(msg.chat_id_, 0, 1, '<b>PONG</b>', 1, 'html')
+        tdcli.sendText(msg.chat_id_, 0, 0, 1, nil, '<b>PONG</b>', 1, 'html')
       end
     end
   elseif (data.ID == "UpdateOption" and data.name_ == "my_id") then

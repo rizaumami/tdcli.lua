@@ -1,4 +1,4 @@
-package = "tdcli"
+package = "tdcli.lua"
 version = "0.3-1"
 source = {
   url = "git+https://github.com/rizaumami/tdcli.lua.git",

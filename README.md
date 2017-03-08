@@ -5,14 +5,15 @@ See [wiki](https://github.com/rizaumami/tdcli.lua/wiki) for documentation.
 
 ## How to Use
 
+- `luarocks install tdcli.lua`
+- Import `tdcli.lua` into your bot.
+- Call the functions.
+
 See example script below.
-- Place this `tdcli.lua` file inside the same folder as your bot, or anywhere else as long as you import it properly.
-- Import it into your bot.
-- Call a function.
 
 ```lua
 -- Load tdcli library.
-tdcli = require('tdcli')
+tdcli = require 'tdcli'
 
 -- An alias to sendText
 function sendText(chat_id, reply_to_message_id, text, disable_web_page_preview, parse_mode)
