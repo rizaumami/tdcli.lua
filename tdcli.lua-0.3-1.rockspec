@@ -1,4 +1,4 @@
-package = "tdcli.lua"
+package = "tdcli"
 version = "0.3-1"
 source = {
   url = "git+https://github.com/rizaumami/tdcli.lua.git",
@@ -23,6 +23,6 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["tdcli.lua"] = "tdcli.lua",
+    ["tdcli"] = "tdcli.lua",
   },
 }
