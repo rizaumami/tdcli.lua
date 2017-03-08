@@ -60,6 +60,7 @@ end
 
 -- User can send bold, italic, and monospace text uses HTML or Markdown format.
 local function getParseMode(parse_mode)
+  local P
   if parse_mode then
     local mode = parse_mode:lower()
 
@@ -2058,7 +2059,7 @@ M.reportChannelSpam = reportChannelSpam
 -- @offset Number of channel users to skip
 -- @limit Maximum number of users be returned, can't be greater than 200
 -- filter = Recent|Administrators|Kicked|Bots
-local function getChannelMembers(channel_id, offset, filter, limit, cb, cmd)
+local function getChannelMembers(channel_id, filter, offset, limit, cb, cmd)
   if not limit or limit > 200 then
     limit = 200
   end
@@ -2069,7 +2070,7 @@ local function getChannelMembers(channel_id, offset, filter, limit, cb, cmd)
     filter_ = {
       ID = "ChannelMembers" .. filter
     },
-    offset_ = offset,
+    offset_ = offset or 0,
     limit_ = limit
   }, cb or dl_cb, cmd)
 end
